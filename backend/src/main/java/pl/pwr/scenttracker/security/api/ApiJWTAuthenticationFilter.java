@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,6 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.pwr.scenttracker.model.User;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,7 +66,7 @@ public class ApiJWTAuthenticationFilter extends AbstractAuthenticationProcessing
                 String token = Jwts.builder()
                         .setClaims(claims)
                         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                        .signWith(SignatureAlgorithm.HS512, SECRET)
+                        .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)) ,SignatureAlgorithm.HS512)
                         .compact();
                 response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
             }

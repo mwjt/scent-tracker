@@ -7,16 +7,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.pwr.scenttracker.security.api.ApiJWTAuthenticationFilter;
 import pl.pwr.scenttracker.security.api.ApiJWTAuthorizationFilter;
@@ -47,22 +47,27 @@ public class MultiHttpSecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
             return http
-                .csrf()
-                .disable()
-                .antMatcher("/api/**")
-                .authorizeRequests()
-                .antMatchers("/api/v1/user/signup").permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint((req, rsp, ex) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                .and()
-                //.addFilterBefore(new ApiJWTAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-                //.addFilterAfter(new ApiJWTAuthorizationFilter(authenticationManager))
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher("/api/**")
+                .authorizeHttpRequests(
+                        (auth) -> auth
+                                .requestMatchers("/api/v1/user/signup")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
+                )
+                .exceptionHandling(
+                        (exceptionHandling) -> exceptionHandling
+                                .authenticationEntryPoint(
+                                        (req, rsp, ex) -> rsp
+                                                .sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                                )
+                )
+                .addFilter(new ApiJWTAuthenticationFilter(authenticationManager))
+                .addFilter(new ApiJWTAuthorizationFilter(authenticationManager))
+                .sessionManagement(
+                        (sessionManagement) -> sessionManagement.
+                                sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
         }
     }
@@ -89,41 +94,36 @@ public class MultiHttpSecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             return http
-                    .cors()
-                    .and()
-                    .csrf()
-                    .disable()
-                    .authorizeRequests()
-                    .antMatchers("/").permitAll()
-                    .antMatchers("/login").permitAll()
-                    .antMatchers("/signup").permitAll()
-                    .antMatchers("/dashboard/**").hasAuthority("ADMIN")
-                    .anyRequest()
-                    .authenticated()
-                    .and()
-                    .formLogin()
-                    .loginPage("/login")
-                    .permitAll()
-                    .failureUrl("/login?error=true")
-                    .usernameParameter("login")
-                    .passwordParameter("password")
-                    .successHandler(customAuthenticationSuccessHandler)
-                    .and()
-                    .logout()
-                    .permitAll()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessHandler(new CustomLogoutSuccessHandler())
-                    .deleteCookies("JSESSIONID")
-                    .logoutSuccessUrl("/")
-                    .and()
-                    .exceptionHandling()
-                    .and()
+                    .cors(Customizer.withDefaults())
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests((auth) -> auth
+                            .requestMatchers("/").permitAll()
+                            .requestMatchers("/login").permitAll()
+                            .requestMatchers("/signup").permitAll()
+                            .requestMatchers("/dashboard/**").hasAuthority("ADMIN")
+                            .anyRequest().authenticated()
+                    )
+                    .formLogin((form) -> form
+                            .loginPage("/login").permitAll()
+                            .failureUrl("/login?error=true")
+                            .usernameParameter("login")
+                            .passwordParameter("password")
+                            .successHandler(customAuthenticationSuccessHandler)
+                    )
+                    .logout((logout) -> logout
+                            .permitAll()
+                            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                            .logoutSuccessHandler(new CustomLogoutSuccessHandler())
+                            .deleteCookies("JSESSIONID")
+                            .logoutSuccessUrl("/")
+                    )
+                    .exceptionHandling(Customizer.withDefaults())
                     .build();
         }
 
         @Bean
         public WebSecurityCustomizer webSecurityCustomizer() {
-            return (web) -> web.ignoring().antMatchers(
+            return (web) -> web.ignoring().requestMatchers(
                     "/resources/**", "/static/**", "/css/**", "/js/**", "/images/**",
                     "/resources/static/**", "/css/**", "/js/**", "/img/**", "/fonts/**",
                     "/images/**", "/scss/**", "/vendor/**", "/favicon.ico", "/auth/**", "/favicon.png",
