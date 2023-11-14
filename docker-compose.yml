@@ -17,7 +17,7 @@ services:
       - backdb
 
   backend:
-    depends_on:
+    links:
       - db
     build: ./backend
     restart: on-failure
