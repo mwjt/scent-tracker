@@ -1,8 +1,14 @@
 package pl.pwr.scent_tracker.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import pl.pwr.scent_tracker.model.api.PagePerfumeSimpleRes;
 import pl.pwr.scent_tracker.model.api.PerfumeReq;
+import pl.pwr.scent_tracker.model.api.PerfumeSimpleRes;
 import pl.pwr.scent_tracker.model.dto.entity.AccordDTO;
 import pl.pwr.scent_tracker.model.dto.entity.BrandDTO;
 import pl.pwr.scent_tracker.model.dto.entity.PerfumeDTO;
@@ -16,6 +22,7 @@ import pl.pwr.scent_tracker.service.PerfumeService;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class PerfumeServiceImpl implements PerfumeService {
@@ -221,5 +228,23 @@ public class PerfumeServiceImpl implements PerfumeService {
         Perfume perfume = perfumeRepository.findById(id).orElse(null);
         if (perfume == null) throw new Exception("Perfume with id " + id + " does not exist");
         perfumeRepository.delete(perfume);
+    }
+
+    @Override
+    public PagePerfumeSimpleRes getPage(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<Perfume> perfumePage = perfumeRepository.findAll(pageable);
+        List<Perfume> perfumeList = perfumePage.getContent();
+        List<PerfumeSimpleRes> perfumes = perfumeList.stream().map(p -> new PerfumeSimpleRes(p.getId(), p.getBrand().getName(), p.getName())).toList();
+        int total = perfumePage.getTotalPages();
+        return new PagePerfumeSimpleRes(total, perfumes);
+    }
+
+    @Override
+    public PerfumeSimpleRes getPerfumeById(Long id) throws Exception {
+        Perfume perfume = perfumeRepository.findById(id).orElse(null);
+        if (perfume == null) throw new Exception("404");
+        return new PerfumeSimpleRes(perfume.getId(), perfume.getBrand().getName(), perfume.getName());
     }
 }

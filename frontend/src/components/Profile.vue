@@ -1,41 +1,41 @@
 <script>
+import { ref } from 'vue'
+import { getProfile } from '../services/user.service'
+
 export default {
-  name: 'Profile',
-  computed: {
-    currentUser() {
-      return this.$store.state.auth.user;
+  name: 'ProfileItem',
+  data() {
+    return {
+      login: '',
+      email: '',
+      avatarPath: '',
     }
   },
-  mounted() {
-    if (!this.currentUser) {
-      this.$router.push('/login');
-    }
-  }
-};
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user
+    },
+  },
+  async beforeMount() {
+    this.$loading = ref(true)
+    console.log(this.currentUser)
+    let res = await getProfile(this.currentUser.login)
+    console.log(res)
+    this.login = res.login
+    this.email = res.email
+    this.avatarPath = res.avatarPath
+    this.$loading = ref(false)
+  },
+}
 </script>
 
 <template>
-  <div class="container">
-    <header class="jumbotron">
-      <h3>
-        <strong>{{currentUser.login}}</strong> Profile
-      </h3>
-    </header>
-    <p>
-      <strong>Token:</strong>
-      {{currentUser.token.substring(0, 20)}} ... {{currentUser.token.substr(currentUser.token.length - 20)}}
-    </p>
-    <p>
-      <strong>Id:</strong>
-      {{currentUser.id}}
-    </p>
-    <p>
-      <strong>Email:</strong>
-      {{currentUser.email}}
-    </p>
-    <strong>Authorities:</strong>
-    <ul>
-      <li v-for="role in currentUser.roles" :key="role">{{role}}</li>
-    </ul>
-  </div>
+  <v-col cols="auto">
+    <v-sheet elevation="10" class="py-4 px-1">
+      <v-chip-group mandatory selected-class="text-primary">
+        <v-chip> {{ login }} </v-chip>
+        <v-chip>{{ email }}</v-chip>
+      </v-chip-group>
+    </v-sheet>
+  </v-col>
 </template>

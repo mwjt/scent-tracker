@@ -1,55 +1,68 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from "../components/Home.vue"
-import Login from "../components/Login.vue"
-import Register from "../components/Register.vue"
+import HomeItem from '../components/Home.vue'
+import LoginItem from '../components/Login.vue'
+import RegisterItem from '../components/Register.vue'
+import PerfumesItem from '../components/Perfumes.vue'
+import PerfumeItem from '../components/Perfume.vue'
+import { getPerfume } from '../services/perfume.service'
 
-
-const Profile = () => import("../components/Profile.vue")
+const Profile = () => import('../components/Profile.vue')
 
 const routes = [
   {
-    path: "/",
-    name: "home",
-    component: Home,
+    path: '/',
+    name: 'home',
+    component: HomeItem,
   },
   {
-    path: "/home",
-    component: Home,
+    path: '/home',
+    component: HomeItem,
   },
   {
-    path: "/login",
-    name: "login",
-    component: Login,
+    path: '/login',
+    name: 'login',
+    component: LoginItem,
   },
   {
-    path: "/register",
-    name: "register",
-    component: Register,
+    path: '/register',
+    name: 'register',
+    component: RegisterItem,
   },
   {
-    path: "/profile",
-    name: "profile",
-    component: Profile
-  }
-];
+    path: '/profile',
+    name: 'profile',
+    component: Profile,
+  },
+  {
+    path: '/perfumes',
+    name: 'perfumes',
+    component: PerfumesItem,
+  },
+  {
+    path: '/perfumes/:brand/:name',
+    name: 'perfumeBrandName',
+    component: PerfumeItem,
+    props: true,
+  },
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-});
+})
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register', '/home'];
-  const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
+  const publicPages = ['/login', '/register', '/home']
+  const authRequired = !publicPages.includes(to.path)
+  const loggedIn = localStorage.getItem('user')
 
   // trying to access a restricted page + not logged in
   // redirect to login page
   if (authRequired && !loggedIn) {
-    next('/login');
+    next('/login')
   } else {
-    next();
+    next()
   }
-});
+})
 
 export default router

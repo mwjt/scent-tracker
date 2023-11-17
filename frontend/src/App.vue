@@ -1,84 +1,83 @@
 <script>
 export default {
+  data: () => ({
+    drawer: false,
+  }),
   computed: {
     currentUser() {
-      return this.$store.state.auth.user;
+      return this.$store.state.auth.user
     },
     showAdminBoard() {
       if (this.currentUser && this.currentUser['roles']) {
-        return this.currentUser['roles'].includes('ADMIN');
+        return this.currentUser['roles'].includes('ADMIN')
       }
 
-      return false;
+      return false
     },
     showModeratorBoard() {
       if (this.currentUser && this.currentUser['roles']) {
-        return this.currentUser['roles'].includes('ROLE_MODERATOR');
+        return this.currentUser['roles'].includes('ROLE_MODERATOR')
       }
 
-      return false;
-    }
+      return false
+    },
   },
   methods: {
     logOut() {
-      this.$store.dispatch('auth/logout');
-      this.$router.push('/login');
-    }
-  }
-};
+      this.$store.dispatch('auth/logout')
+      this.$router.push('/login')
+    },
+  },
+  watch: {
+    group() {
+      this.drawer = false
+    },
+  },
+}
 </script>
 
 <template>
-  <div id="app">
-    <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <a href="/" class="navbar-brand">bezKoder</a>
-      <div class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <router-link to="/home" class="nav-link">
-            <font-awesome-icon icon="home" /> Home
-          </router-link>
-        </li>
-        <li v-if="showAdminBoard" class="nav-item">
-          <router-link to="/admin" class="nav-link">Admin Board</router-link>
-        </li>
-        <li v-if="showModeratorBoard" class="nav-item">
-          <router-link to="/mod" class="nav-link">Moderator Board</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link v-if="currentUser" to="/home" class="nav-link">User</router-link>
-        </li>
-      </div>
+  <v-card color="grey-lighten-4" flat rounded="0">
+    <v-app>
+      <v-app-bar color="primary" density="compact">
+        <template v-slot:prepend>
+          <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        </template>
 
-      <div v-if="!currentUser" class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <router-link to="/register" class="nav-link">
-            <font-awesome-icon icon="user-plus" /> Sign Up
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link to="/login" class="nav-link">
-            <font-awesome-icon icon="sign-in-alt" /> Login
-          </router-link>
-        </li>
-      </div>
+        <router-link to="/home" style="text-decoration: none; color: inherit">
+          <v-app-bar-title>Scent Tracker</v-app-bar-title>
+        </router-link>
 
-      <div v-if="currentUser" class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <router-link to="/profile" class="nav-link">
-            <font-awesome-icon icon="user" />
-            {{ currentUser.username }}
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" @click.prevent="logOut">
-            <font-awesome-icon icon="sign-out-alt" /> LogOut
-          </a>
-        </li>
-      </div>
-    </nav>
+        <v-spacer></v-spacer>
 
-    <div class="container">
-      <router-view />
-    </div>
-  </div>
+        <template v-slot:append>
+          <router-link to="/login" style="text-decoration: none; color: inherit">
+            <v-btn prepend-icon="mdi-login" class="text-capitalize" v-if="!currentUser"> Login </v-btn>
+          </router-link>
+
+          <router-link to="/profile" style="text-decoration: none; color: inherit">
+            <v-btn icon="mdi-account" v-if="currentUser"> </v-btn>
+          </router-link>
+
+          <v-btn prepend-icon="mdi-logout" class="text-capitalize" v-if="currentUser" @click.prevent="logOut">
+            Logout
+          </v-btn>
+        </template>
+      </v-app-bar>
+
+      <v-navigation-drawer v-model="drawer" temporary>
+        <v-list>
+          <router-link to="/perfumes" style="text-decoration: none; color: inherit">
+            <v-list-item> Perfumes </v-list-item>
+          </router-link>
+        </v-list>
+      </v-navigation-drawer>
+
+      <v-main>
+        <v-container fluid>
+          <router-view />
+        </v-container>
+      </v-main>
+    </v-app>
+  </v-card>
 </template>

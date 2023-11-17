@@ -1,22 +1,8 @@
-import axios from "axios";
-import authHeader from "./auth-header";
+import axios from 'axios'
+import authHeader from './auth-header'
 
-class UserService {
-  getPublicContent() {
-    return axios.get('/api/v1/all');
-  }
-
-  getUserBoard() {
-    return axios.get('/api/v1/user', { headers: authHeader() })
-  }
-
-  getModeratorBoard() {
-    return axios.get('/api/v1/mod', { headers: authHeader() })
-  }
-
-  getAdminBoard() {
-    return axios.get('/api/v1/admin', { headers: authHeader() })
-  }
+export async function getProfile(login) {
+  const promise = axios.get('api/v1/user/' + login, { headers: authHeader() })
+  const data = promise.then((response) => response.data)
+  return data
 }
-
-export default new UserService();
