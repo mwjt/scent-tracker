@@ -10,7 +10,7 @@ public class UserMapper {
                 .login(user.getLogin())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .avatarPath(user.getAvatarPath())
+                .galleryId(user.getGallery().getId())
                 .build();
     }
 }

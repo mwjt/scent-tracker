@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -36,8 +39,9 @@ public class Perfume {
     @JoinColumn(name = "CONCENTRATION_ID", nullable = false)
     private Concentration concentration;
 
-    @Column(name = "GALLERY_PATH")
-    private String galleryPath;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "GALLERY_ID")
+    private Gallery gallery;
 
     @Column(name = "YEAR")
     private Short year;
@@ -56,4 +60,11 @@ public class Perfume {
 
     @Column(name = "VALUE", nullable = false)
     private Float value;
+
+    @ManyToMany
+    @JoinTable(name = "PERFUME_TAG",
+            joinColumns = @JoinColumn(name = "PERFUME_ID", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "TAG_ID", referencedColumnName = "ID")
+    )
+    private Set<Tag> tags = new HashSet<>();
 }

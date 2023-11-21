@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -24,4 +27,7 @@ public class Tag {
 
     @Column(name = "NAME", length = 50, nullable = false, unique = true)
     private String name;
+
+    @ManyToMany(mappedBy = "tags")
+    Set<Perfume> perfumes = new HashSet<>();
 }

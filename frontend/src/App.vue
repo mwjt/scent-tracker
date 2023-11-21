@@ -56,10 +56,12 @@ export default {
           </router-link>
 
           <router-link to="/profile" style="text-decoration: none; color: inherit">
-            <v-btn icon="mdi-account" v-if="currentUser"> </v-btn>
+            <v-btn prepend-icon="mdi-account" v-if="currentUser" style="text-transform: unset">
+              {{ currentUser.login }}
+            </v-btn>
           </router-link>
 
-          <v-btn prepend-icon="mdi-logout" class="text-capitalize" v-if="currentUser" @click.prevent="logOut">
+          <v-btn prepend-icon="mdi-logout" v-if="currentUser" style="text-transform: unset" @click.prevent="logOut">
             Logout
           </v-btn>
         </template>

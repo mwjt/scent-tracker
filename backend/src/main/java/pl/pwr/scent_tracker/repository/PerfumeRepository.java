@@ -1,12 +1,10 @@
 package pl.pwr.scent_tracker.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pl.pwr.scent_tracker.model.entity.Brand;
-import pl.pwr.scent_tracker.model.entity.Concentration;
-import pl.pwr.scent_tracker.model.entity.Perfume;
-import pl.pwr.scent_tracker.model.entity.Perfumer;
+import pl.pwr.scent_tracker.model.entity.*;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
 

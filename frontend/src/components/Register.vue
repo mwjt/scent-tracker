@@ -1,38 +1,32 @@
 <script>
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import * as yup from 'yup'
-
 export default {
   name: 'RegisterItem',
-  components: {
-    Form,
-    Field,
-    ErrorMessage,
-  },
   data() {
-    const schema = yup.object().shape({
-      login: yup
-        .string()
-        .required('Login is required!')
-        .min(3, 'Must be at least 3 characters!')
-        .max(20, 'Must be maximum 20 characters!'),
-      email: yup
-        .string()
-        .required('Email is required!')
-        .email('Email is invalid!')
-        .max(50, 'Must be maximum 50 characters!'),
-      password: yup
-        .string()
-        .required('Password is required!')
-        .min(4, 'Must be at least 4 characters!')
-        .max(40, 'Must be maximum 40 characters!'),
-    })
-
     return {
-      successful: false,
+      login: null,
+      email: null,
+      password1: null,
+      password2: null,
       loading: false,
       message: '',
-      schema,
+      terms: false,
+      alert: false,
+      form: false,
+      rules: {
+        required: (value) => !!value || 'Field is required',
+        email: (value) => {
+          const pattern =
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Invalid e-mail'
+        },
+        password: (value) => {
+          const pattern = /^^[a-zA-Z0-9]{6,}$/
+          return pattern.test(value) || 'Password too simple (use at least 6 characters'
+        },
+        repeatPassword: (value) => {
+          return value == this.password1 || 'Passwords must be identical'
+        },
+      },
     }
   },
   computed: {
@@ -46,21 +40,26 @@ export default {
     }
   },
   methods: {
-    handleRegister(user) {
+    onSubmit() {
+      console.log('guwno')
+
       this.message = ''
-      this.successful = false
       this.loading = true
+
+      let user = {
+        login: this.login,
+        email: this.email,
+        password: this.password1,
+      }
 
       this.$store.dispatch('auth/register', user).then(
         (data) => {
           this.message = data.message
-          this.successful = true
           this.loading = false
         },
         (error) => {
           this.message =
             (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
-          this.successful = false
           this.loading = false
         }
       )
@@ -70,38 +69,58 @@ export default {
 </script>
 
 <template>
-  <div class="col-md-12">
-    <div class="card card-container">
-      <Form @submit="handleRegister" :validation-schema="schema">
-        <div v-if="!successful">
-          <div class="form-group">
-            <label for="login">Login</label>
-            <Field name="login" type="text" class="form-control" />
-            <ErrorMessage name="login" class="error-feedback" />
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <Field name="email" type="email" class="form-control" />
-            <ErrorMessage name="email" class="error-feedback" />
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <Field name="password" type="password" class="form-control" />
-            <ErrorMessage name="password" class="error-feedback" />
-          </div>
+  <v-container>
+    <v-card class="mx-auto px-6 py-2" max-width="344" title="Sign-up">
+      <v-form @submit.prevent="onSubmit" v-model="form" ref="formRef">
+        <v-text-field
+          v-model="login"
+          :readonly="loading"
+          :rules="[rules.required]"
+          class="mb-2"
+          clearable
+          label="Login"
+        ></v-text-field>
 
-          <div class="form-group">
-            <button class="btn btn-primary btn-block" :disabled="loading">
-              <span v-show="loading" class="spinner-border spinner-border-sm"></span>
-              Sign Up
-            </button>
-          </div>
-        </div>
-      </Form>
+        <v-text-field
+          v-model="email"
+          :readonly="loading"
+          :rules="[rules.required, rules.email]"
+          class="mb-2"
+          clearable
+          label="E-mail"
+        ></v-text-field>
 
-      <div v-if="message" class="alert" :class="successful ? 'alert-success' : 'alert-danger'">
-        {{ message }}
-      </div>
-    </div>
-  </div>
+        <v-text-field
+          v-model="password1"
+          :readonly="loading"
+          :rules="[rules.required, rules.password]"
+          clearable
+          label="Password"
+        ></v-text-field>
+
+        <v-text-field
+          v-model="password2"
+          :readonly="loading"
+          :rules="[rules.required, rules.repeatPassword]"
+          clearable
+          label="Repeat password"
+        ></v-text-field>
+
+        <v-checkbox
+          v-model="terms"
+          color="secondary"
+          label="I agree to site terms and conditions"
+          :rules="[rules.required]"
+        ></v-checkbox>
+
+        <v-btn :disabled="!form" :loading="loading" block type="submit" color="success">
+          Complete Registration
+
+          <v-icon icon="mdi-chevron-right" end></v-icon>
+        </v-btn>
+      </v-form>
+      <v-alert v-model="alert" class="mt-2" type="error" :text="message" />
+      <div style="margin: 10px 0px">Registered already? <router-link to="/login"> Sign in! </router-link></div>
+    </v-card>
+  </v-container>
 </template>

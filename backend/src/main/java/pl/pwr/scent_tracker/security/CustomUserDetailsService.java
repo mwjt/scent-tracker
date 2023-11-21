@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.pwr.scent_tracker.model.dto.entity.UserDTO;
+import pl.pwr.scent_tracker.model.dto.mapper.UserMapper;
+import pl.pwr.scent_tracker.model.entity.User;
 import pl.pwr.scent_tracker.service.UserService;
 
 import java.util.ArrayList;
@@ -18,9 +20,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDTO userDTO = userService.findUserByLogin(username);
-        if (userDTO == null) throw new UsernameNotFoundException("User " + username + " not found");
-        return buildUserForAuthentication(userDTO);
+        try {
+            User user = userService.getUserByLogin(username);
+            return buildUserForAuthentication(UserMapper.toUserDTO(user));
+        } catch (Exception e) {
+            throw new UsernameNotFoundException("User " + username + " not found");
+        }
+
     }
 
     private UserDetails buildUserForAuthentication(UserDTO userDTO) {

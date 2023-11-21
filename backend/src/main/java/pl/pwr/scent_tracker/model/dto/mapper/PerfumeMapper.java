@@ -11,7 +11,7 @@ public class PerfumeMapper {
                 .brandId(perfume.getBrand().getId())
                 .perfumerId(perfume.getPerfumer().getId())
                 .concentrationId(perfume.getConcentration().getId())
-                .galleryPath(perfume.getGalleryPath())
+                .galleryId(perfume.getGallery().getId())
                 .year(perfume.getYear())
                 .scent(perfume.getScent())
                 .longevity(perfume.getLongevity())

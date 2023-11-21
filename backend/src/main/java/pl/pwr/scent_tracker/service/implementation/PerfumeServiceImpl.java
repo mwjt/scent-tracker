@@ -45,6 +45,9 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private GalleryRepository galleryRepository;
+
     @Override
     public AccordDTO getAccord(String name) {
         return AccordMapper.toAccordDTO(accordRepository.findByName(name));
@@ -61,9 +64,9 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public AccordDTO updateAccord(AccordDTO accordDTO) throws Exception {
         Accord accord = accordRepository.findById(accordDTO.getId()).orElse(null);
-        if (accord == null) throw new Exception("Accord with id " + accordDTO.getId() + " does not exist");
+        if (accord == null) throw new Exception("Accord does not exist");
         accord = accordRepository.findByName(accordDTO.getName());
-        if (!Objects.equals(accord.getId(), accordDTO.getId())) throw new Exception(accordDTO.getName() + " does not exist");
+        if (!Objects.equals(accord.getId(), accordDTO.getId())) throw new Exception("Accord does not exist");
         accord = accordRepository.save(accord.setName(accordDTO.getName()));
         return AccordMapper.toAccordDTO(accord);
     }
@@ -71,7 +74,7 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public void removeAccord(Long id) throws Exception {
         Accord accord = accordRepository.findById(id).orElse(null);
-        if (accord == null) throw new Exception("Accord with id " + id + " does not exist");
+        if (accord == null) throw new Exception("Accord does not exist");
         accordRepository.delete(accord);
     }
 
@@ -83,7 +86,7 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public BrandDTO addBrand(BrandDTO brandDTO) throws Exception {
         Brand brand = brandRepository.findByName(brandDTO.getName());
-        if (brand != null) throw new Exception(brandDTO.getName() + " already exists");
+        if (brand != null) throw new Exception("Brand already exists");
         brand = brandRepository.save(Brand.builder()
                 .name(brandDTO.getName())
                 .website(brandDTO.getWebsite())
@@ -96,9 +99,9 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public BrandDTO updateBrand(BrandDTO brandDTO) throws Exception {
         Brand brand = brandRepository.findById(brandDTO.getId()).orElse(null);
-        if (brand == null) throw new Exception("Brand with id " + brandDTO.getId() + " does not exist");
+        if (brand == null) throw new Exception("Brand does not exist");
         brand = brandRepository.findByName(brandDTO.getName());
-        if (!Objects.equals(brand.getId(), brandDTO.getId())) throw new Exception("Brand" + brandDTO.getName() + " already exists");
+        if (!Objects.equals(brand.getId(), brandDTO.getId())) throw new Exception("Brand already exists");
         brand = brandRepository.save(brand
                 .setName(brandDTO.getName())
                 .setWebsite(brandDTO.getWebsite())
@@ -110,35 +113,32 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public void removeBrand(Long id) throws Exception {
         Brand brand = brandRepository.findById(id).orElse(null);
-        if (brand == null) throw new Exception("Brand with id " + id + " does not exist");
+        if (brand == null) throw new Exception("Brand does not exist");
         brandRepository.delete(brand);
     }
 
     @Override
-    public PerfumeDTO getPerfume(PerfumeReq perfumeReq) {
+    public Perfume getPerfume(PerfumeReq perfumeReq) {
         Brand brand = brandRepository.findByName(perfumeReq.getBrand());
-        Perfume perfume = perfumeRepository.findByNameAndBrand(perfumeReq.getName(), brand);
-        return PerfumeMapper.toPerfumeDTO(perfume);
+        return perfumeRepository.findByNameAndBrand(perfumeReq.getName(), brand);
     }
 
     @Override
     public PerfumeDTO addPerfume(PerfumeDTO perfumeDTO) throws Exception {
         Brand brand = brandRepository.findById(perfumeDTO.getBrandId()).orElse(null);
-        if (brand == null) throw new Exception("Brand with id " + perfumeDTO.getBrandId() + " does not exist");
+        if (brand == null) throw new Exception("Brand does not exist");
         Perfumer perfumer = perfumerRepository.findById(perfumeDTO.getPerfumerId()).orElse(null);
-        if (perfumer == null) throw new Exception("Perfumer with id " + perfumeDTO.getPerfumerId() + " does not exist");
+        if (perfumer == null) throw new Exception("Perfumer does not exist");
         Concentration concentration = concentrationRepository.findById(perfumeDTO.getConcentrationId()).orElse(null);
-        if (concentration == null) throw new Exception("Concentration with id " + perfumeDTO.getConcentrationId() + " does not exist");
+        if (concentration == null) throw new Exception("Concentration does not exist");
         Perfume perfume = perfumeRepository.findByNameAndBrand(perfumeDTO.getName(), brand);
-        if (perfume != null) throw new Exception("Perfume " + perfumeDTO.getName() + " of brand " + brand.getName() + " already exist");
+        if (perfume != null) throw new Exception("Perfume already exist");
 
         perfume = Perfume.builder()
                 .name(perfumeDTO.getName())
                 .brand(brand)
                 .perfumer(perfumer)
                 .concentration(concentration)
-                .galleryPath("")
-                //.galleryPath()
                 .year(perfumeDTO.getYear())
                 .bottle(0.0f)
                 .scent(0.0f)
@@ -153,15 +153,15 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public PerfumeDTO updatePerfume(PerfumeDTO perfumeDTO) throws Exception {
         Brand brand = brandRepository.findById(perfumeDTO.getBrandId()).orElse(null);
-        if (brand == null) throw new Exception("Brand with id " + perfumeDTO.getBrandId() + " does not exist");
+        if (brand == null) throw new Exception("Brand does not exist");
         Perfumer perfumer = perfumerRepository.findById(perfumeDTO.getPerfumerId()).orElse(null);
-        if (perfumer == null) throw new Exception("Perfumer with id " + perfumeDTO.getPerfumerId() + " does not exist");
+        if (perfumer == null) throw new Exception("Perfumer does not exist");
         Concentration concentration = concentrationRepository.findById(perfumeDTO.getConcentrationId()).orElse(null);
-        if (concentration == null) throw new Exception("Concentration with id " + perfumeDTO.getConcentrationId() + " does not exist");
+        if (concentration == null) throw new Exception("Concentration does not exist");
         Perfume perfume = perfumeRepository.findByNameAndBrand(perfumeDTO.getName(), brand);
-        if (perfume != null && !Objects.equals(perfume.getId(), perfumeDTO.getId())) throw new Exception("Perfume " + perfumeDTO.getName() + " of brand " + brand.getName() + " already exist");
+        if (perfume != null && !Objects.equals(perfume.getId(), perfumeDTO.getId())) throw new Exception("Perfume already exist");
         perfume = perfumeRepository.findById(perfumeDTO.getId()).orElse(null);
-        if (perfume == null) throw new Exception("Perfume with id " + perfumeDTO.getId() + " does not exist");
+        if (perfume == null) throw new Exception("Perfume does not exist");
 
         perfume.setName(perfumeDTO.getName());
         perfume.setBrand(brand);
@@ -175,7 +175,7 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public void updateScores(Long id) throws Exception {
         Perfume perfume = perfumeRepository.findById(id).orElse(null);
-        if (perfume == null) throw new Exception("Perfume with id " + id + " does not exist");
+        if (perfume == null) throw new Exception("Perfume does not exist");
         List<Review> reviews = reviewRepository.findByPerfume(perfume);
 
         BigInteger scent = BigInteger.ZERO;
@@ -226,7 +226,7 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public void removePerfume(Long id) throws Exception {
         Perfume perfume = perfumeRepository.findById(id).orElse(null);
-        if (perfume == null) throw new Exception("Perfume with id " + id + " does not exist");
+        if (perfume == null) throw new Exception("Perfume does not exist");
         perfumeRepository.delete(perfume);
     }
 
@@ -242,9 +242,20 @@ public class PerfumeServiceImpl implements PerfumeService {
     }
 
     @Override
-    public PerfumeSimpleRes getPerfumeById(Long id) throws Exception {
+    public PerfumeSimpleRes getSimplePerfumeById(Long id) throws Exception {
         Perfume perfume = perfumeRepository.findById(id).orElse(null);
         if (perfume == null) throw new Exception("404");
         return new PerfumeSimpleRes(perfume.getId(), perfume.getBrand().getName(), perfume.getName());
+    }
+
+    @Override
+    public Perfume getPerfumeById(Long id) {
+        return perfumeRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public PerfumeDTO setPerfumePhoto(Perfume perfume, Gallery gallery) {
+        perfume.setGallery(gallery);
+        return PerfumeMapper.toPerfumeDTO(perfume);
     }
 }

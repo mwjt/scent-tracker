@@ -6,9 +6,7 @@ export default {
   name: 'ProfileItem',
   data() {
     return {
-      login: '',
-      email: '',
-      avatarPath: '',
+      user: '',
     }
   },
   computed: {
@@ -21,15 +19,25 @@ export default {
     console.log(this.currentUser)
     let res = await getProfile(this.currentUser.login)
     console.log(res)
-    this.login = res.login
-    this.email = res.email
-    this.avatarPath = res.avatarPath
+    this.user = res
     this.$loading = ref(false)
   },
 }
 </script>
 
 <template>
+  <v-container>
+    <v-row>
+      <v-col>
+        <v-card class="ma-2 pa-2 entries">
+          <div class="top">Username: {{ this.user.login }}</div>
+          <div class="mid">E-mail: {{ this.user.email }}</div>
+          <div class="bot">Role: {{ this.user.role }}</div>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+
   <v-col cols="auto">
     <v-sheet elevation="10" class="py-4 px-1">
       <v-chip-group mandatory selected-class="text-primary">
@@ -39,3 +47,18 @@ export default {
     </v-sheet>
   </v-col>
 </template>
+
+<style lang="scss">
+.entries {
+  font-size: larger;
+  .top {
+    margin: 0 5px 5px 5px;
+  }
+  .mid {
+    margin: 5px;
+  }
+  .bot {
+    margin: 5px 5px 0px 5px;
+  }
+}
+</style>

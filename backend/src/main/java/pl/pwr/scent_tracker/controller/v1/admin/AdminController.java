@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import pl.pwr.scent_tracker.controller.v1.command.AdminSignupFormCommand;
 import pl.pwr.scent_tracker.model.dto.entity.UserDTO;
+import pl.pwr.scent_tracker.model.entity.User;
 import pl.pwr.scent_tracker.model.entity.UserRole;
 import pl.pwr.scent_tracker.service.UserService;
 
@@ -42,7 +43,7 @@ public class AdminController {
             return modelAndView;
         }
         try {
-            UserDTO user = registerAdmin(adminSignupFormCommand);
+            User user = registerAdmin(adminSignupFormCommand);
         } catch (Exception ex) {
             bindingResult.rejectValue("login", "error.adminSignupFormCommand", ex.getMessage());
             return modelAndView;
@@ -51,7 +52,7 @@ public class AdminController {
     }
 
     
-    private UserDTO registerAdmin(@Valid AdminSignupFormCommand adminSignupFormCommand) throws Exception {
+    private User registerAdmin(@Valid AdminSignupFormCommand adminSignupFormCommand) throws Exception {
         return userService.signup(new UserDTO()
                 .setLogin(adminSignupFormCommand.getLogin())
                 .setEmail(adminSignupFormCommand.getEmail())

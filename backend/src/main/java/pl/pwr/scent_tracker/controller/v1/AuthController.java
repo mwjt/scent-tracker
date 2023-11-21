@@ -13,6 +13,8 @@ import pl.pwr.scent_tracker.model.api.LoginReq;
 import pl.pwr.scent_tracker.model.api.LoginRes;
 import pl.pwr.scent_tracker.model.api.RegisterReq;
 import pl.pwr.scent_tracker.model.dto.entity.UserDTO;
+import pl.pwr.scent_tracker.model.dto.mapper.UserMapper;
+import pl.pwr.scent_tracker.model.entity.User;
 import pl.pwr.scent_tracker.security.JwtUtil;
 import pl.pwr.scent_tracker.service.UserService;
 
@@ -40,8 +42,8 @@ public class AuthController {
                             loginReq.getLogin(),
                             loginReq.getPassword())
             );
-            UserDTO user = userService.findUserByLogin(loginReq.getLogin());
-            LoginRes loginRes = new LoginRes(user.getLogin(), jwtUtil.createToken(user));
+            User user = userService.getUserByLogin(loginReq.getLogin());
+            LoginRes loginRes = new LoginRes(user.getLogin(), jwtUtil.createToken(UserMapper.toUserDTO(user)));
             return ResponseEntity.ok(loginRes);
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -61,8 +63,8 @@ public class AuthController {
                 .password(req.getPassword())
                 .build();
         try {
-            UserDTO registeredUser = userService.signup(userDTO);
-            return ResponseEntity.ok("ok");
+            userService.signup(userDTO);
+            return ResponseEntity.ok().build();
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorRes(HttpStatus.BAD_REQUEST, ex.getMessage()));

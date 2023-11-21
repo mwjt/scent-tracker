@@ -20,6 +20,6 @@ public class UserDTO {
     private String login;
     private String email;
     private String password;
-    private String avatarPath;
+    private Long galleryId;
     private UserRole role;
 }

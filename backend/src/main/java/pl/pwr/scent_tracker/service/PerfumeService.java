@@ -6,8 +6,8 @@ import pl.pwr.scent_tracker.model.api.PerfumeSimpleRes;
 import pl.pwr.scent_tracker.model.dto.entity.AccordDTO;
 import pl.pwr.scent_tracker.model.dto.entity.BrandDTO;
 import pl.pwr.scent_tracker.model.dto.entity.PerfumeDTO;
-
-import java.util.List;
+import pl.pwr.scent_tracker.model.entity.Gallery;
+import pl.pwr.scent_tracker.model.entity.Perfume;
 
 public interface PerfumeService {
 
@@ -24,12 +24,14 @@ public interface PerfumeService {
     void removeBrand(Long id) throws Exception;
 
     // Perfumes
-    PerfumeDTO getPerfume(PerfumeReq perfumeReq);
+    Perfume getPerfume(PerfumeReq perfumeReq);
     PerfumeDTO addPerfume(PerfumeDTO perfumeDTO) throws Exception;
     PerfumeDTO updatePerfume(PerfumeDTO perfumeDTO) throws Exception;
     void updateScores(Long id) throws Exception;
     void removePerfume(Long id) throws Exception;
     PagePerfumeSimpleRes getPage(int pageNo, int pageSize, String sortBy, String sortDir);
-    PerfumeSimpleRes getPerfumeById(Long id) throws Exception;
+    PerfumeSimpleRes getSimplePerfumeById(Long id) throws Exception;
+    Perfume getPerfumeById(Long id) throws Exception;
+    PerfumeDTO setPerfumePhoto(Perfume perfume, Gallery gallery);
 
 }

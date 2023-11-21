@@ -1,24 +1,14 @@
 <script>
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import * as yup from 'yup'
-
 export default {
   name: 'LoginItem',
-  components: {
-    Form,
-    Field,
-    ErrorMessage,
-  },
   data() {
-    const schema = yup.object().shape({
-      login: yup.string().required('Login is required!'),
-      password: yup.string().required('Password is required!'),
-    })
-
     return {
       loading: false,
-      message: '',
-      schema,
+      form: false,
+      login: null,
+      password: null,
+      message: null,
+      alert: false,
     }
   },
   computed: {
@@ -26,56 +16,67 @@ export default {
       return this.$store.state.auth.status.loggedIn
     },
   },
-  created() {
+  mounted() {
     if (this.loggedIn) {
       this.$router.push('/profile')
     }
   },
   methods: {
-    handleLogin(user) {
+    onSubmit() {
+      if (!this.form) return
       this.loading = true
 
+      let user = {
+        login: this.login,
+        password: this.password,
+      }
       this.$store.dispatch('auth/login', user).then(
         () => {
+          this.loading = false
           this.$router.push('/profile')
         },
         (error) => {
           this.loading = false
           this.message =
             (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+          this.alert = true
         }
       )
+    },
+    required(v) {
+      return !!v || 'Field is required'
     },
   },
 }
 </script>
 
 <template>
-  <div class="col-md-12">
-    <div class="card card-container">
-      <Form @submit="handleLogin" :validation-schema="schema">
-        <div class="form-group">
-          <label for="login">Login</label>
-          <Field name="login" type="text" class="form-control" />
-          <ErrorMessage name="login" class="error-feedback" />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <Field name="password" type="password" class="form-control" />
-          <ErrorMessage name="password" class="error-feedback" />
-        </div>
-        <div class="form-group">
-          <button class="btn btn-primary btn-block" :disabled="loading">
-            <span v-show="loading" class="spinner-border spinner-border-sm"> </span>
-            <span>Login</span>
-          </button>
-        </div>
-        <div class="form-group">
-          <div v-if="message" class="alert alert-danger" role="alert">
-            {{ message }}
-          </div>
-        </div>
-      </Form>
-    </div>
-  </div>
+  <v-container>
+    <v-card class="mx-auto px-6 py-2" max-width="344" title="Login">
+      <v-form v-model="form" @submit.prevent="onSubmit">
+        <v-text-field
+          v-model="login"
+          :readonly="loading"
+          :rules="[required]"
+          class="mb-2"
+          clearable
+          label="Login"
+        ></v-text-field>
+
+        <v-text-field
+          v-model="password"
+          :readonly="loading"
+          :rules="[required]"
+          clearable
+          label="Password"
+        ></v-text-field>
+
+        <v-btn :disabled="!form" :loading="loading" type="submit" block color="success">
+          Sign In <v-icon icon="mdi-chevron-right" end></v-icon>
+        </v-btn>
+      </v-form>
+      <v-alert v-model="alert" class="mt-2" type="error" :text="message" />
+      <div style="margin: 10px 0px">Don't have an account? <router-link to="/register"> Sign up! </router-link></div>
+    </v-card>
+  </v-container>
 </template>

@@ -20,7 +20,7 @@ public class PerfumeDTO {
     private Long brandId;
     private Long perfumerId;
     private Long concentrationId;
-    private String galleryPath;
+    private Long galleryId;
     private Short year;
     private Float scent;
     private Float longevity;

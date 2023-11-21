@@ -26,9 +26,9 @@ public class DashboardController {
     public ModelAndView dashboard() {
         ModelAndView modelAndView = new ModelAndView("dashboard");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDTO userDTO = userService.findUserByLogin(auth.getName());
-        modelAndView.addObject("currentUser", userDTO);
-        modelAndView.addObject("userName", userDTO.getLogin());
+//        UserDTO userDTO = userService.getUserByLogin(auth.getName());
+//        modelAndView.addObject("currentUser", userDTO);
+//        modelAndView.addObject("userName", userDTO.getLogin());
         return modelAndView;
     }
 
@@ -36,33 +36,33 @@ public class DashboardController {
     public ModelAndView updateProfile(@Valid @ModelAttribute("profileForm") ProfileFormCommand profileFormCommand, BindingResult bindingResult) throws Exception {
         ModelAndView modelAndView = new ModelAndView("profile");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDTO userDTO = userService.findUserByLogin(auth.getName());
-        PasswordFormCommand passwordFormCommand = new PasswordFormCommand()
-                .setLogin(userDTO.getLogin())
-                .setPassword(userDTO.getPassword());
-        modelAndView.addObject("passwordForm", passwordFormCommand);
-        if (!bindingResult.hasErrors()) {
-            userDTO
-                    .setLogin(profileFormCommand.getLogin())
-                    .setEmail(profileFormCommand.getEmail());
-            userService.updateProfile(userDTO);
-        }
+//        UserDTO userDTO = userService.getUserByLogin(auth.getName());
+//        PasswordFormCommand passwordFormCommand = new PasswordFormCommand()
+//                .setLogin(userDTO.getLogin())
+//                .setPassword(userDTO.getPassword());
+//        modelAndView.addObject("passwordForm", passwordFormCommand);
+//        if (!bindingResult.hasErrors()) {
+//            userDTO
+//                    .setLogin(profileFormCommand.getLogin())
+//                    .setEmail(profileFormCommand.getEmail());
+//            userService.setUserLoginAndEmail(userDTO);
+//        }
         return modelAndView;
     }
 
     @PostMapping(value = "/password")
     public ModelAndView changePassword(@Valid @ModelAttribute("passwordForm") PasswordFormCommand passwordFormCommand, BindingResult bindingResult) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDTO userDTO = userService.findUserByLogin(auth.getName());
+//        UserDTO userDTO = userService.getUserByLogin(auth.getName());
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("profile");
-            ProfileFormCommand profileFormCommand = new ProfileFormCommand()
-                    .setLogin(userDTO.getLogin())
-                    .setEmail(userDTO.getEmail());
-            modelAndView.addObject("profileForm", profileFormCommand);
+//            ProfileFormCommand profileFormCommand = new ProfileFormCommand()
+//                    .setLogin(userDTO.getLogin())
+//                    .setEmail(userDTO.getEmail());
+//            modelAndView.addObject("profileForm", profileFormCommand);
             return modelAndView;
         }
-        userService.changePassword(userDTO, passwordFormCommand.getPassword());
+//        userService.setUserPassword(userDTO, passwordFormCommand.getPassword());
         return new ModelAndView("login");
     }
 }

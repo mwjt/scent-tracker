@@ -30,8 +30,9 @@ public class User {
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 
-    @Column(name = "AVATAR_PATH")
-    private String avatarPath;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "GALLERY_ID")
+    private Gallery gallery;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ROLE")
