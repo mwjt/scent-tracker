@@ -22,7 +22,6 @@ import pl.pwr.scent_tracker.service.PerfumeService;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class PerfumeServiceImpl implements PerfumeService {
@@ -87,11 +86,13 @@ public class PerfumeServiceImpl implements PerfumeService {
     public BrandDTO addBrand(BrandDTO brandDTO) throws Exception {
         Brand brand = brandRepository.findByName(brandDTO.getName());
         if (brand != null) throw new Exception("Brand already exists");
+
+        Gallery gallery = galleryRepository.findByName("Default brand");
         brand = brandRepository.save(Brand.builder()
                 .name(brandDTO.getName())
                 .website(brandDTO.getWebsite())
-                .photoPath(brandDTO.getPhotoPath())
-                .textPath(brandDTO.getTextPath())
+                .gallery(gallery)
+                .text(brandDTO.getText())
                 .build());
         return BrandMapper.toBrandDTO(brand);
     }
@@ -105,8 +106,8 @@ public class PerfumeServiceImpl implements PerfumeService {
         brand = brandRepository.save(brand
                 .setName(brandDTO.getName())
                 .setWebsite(brandDTO.getWebsite())
-                .setPhotoPath(brandDTO.getPhotoPath())
-                .setTextPath(brandDTO.getTextPath()));
+                .setGallery(galleryRepository.findById(brandDTO.getGalleryId()).orElse(null))
+                .setText(brandDTO.getText()));
         return BrandMapper.toBrandDTO(brand);
     }
 
@@ -115,6 +116,17 @@ public class PerfumeServiceImpl implements PerfumeService {
         Brand brand = brandRepository.findById(id).orElse(null);
         if (brand == null) throw new Exception("Brand does not exist");
         brandRepository.delete(brand);
+    }
+
+    @Override
+    public Brand getBrandById(Long id) throws Exception {
+        return brandRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public BrandDTO setBrandPhoto(Brand brand, Gallery gallery) {
+        brand.setGallery(gallery);
+        return BrandMapper.toBrandDTO(brand);
     }
 
     @Override
@@ -134,6 +146,8 @@ public class PerfumeServiceImpl implements PerfumeService {
         Perfume perfume = perfumeRepository.findByNameAndBrand(perfumeDTO.getName(), brand);
         if (perfume != null) throw new Exception("Perfume already exist");
 
+        Gallery gallery = galleryRepository.findByName("Default perfume");
+
         perfume = Perfume.builder()
                 .name(perfumeDTO.getName())
                 .brand(brand)
@@ -145,6 +159,7 @@ public class PerfumeServiceImpl implements PerfumeService {
                 .sillage(0.0f)
                 .longevity(0.0f)
                 .value(0.0f)
+                .gallery(gallery)
                 .build();
         perfume = perfumeRepository.save(perfume);
         return PerfumeMapper.toPerfumeDTO(perfume);
@@ -236,7 +251,7 @@ public class PerfumeServiceImpl implements PerfumeService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Perfume> perfumePage = perfumeRepository.findAll(pageable);
         List<Perfume> perfumeList = perfumePage.getContent();
-        List<PerfumeSimpleRes> perfumes = perfumeList.stream().map(p -> new PerfumeSimpleRes(p.getId(), p.getBrand().getName(), p.getName())).toList();
+        List<PerfumeSimpleRes> perfumes = perfumeList.stream().map(p -> new PerfumeSimpleRes(p.getId(), p.getBrand().getName(), p.getName(), p.getGallery().getId())).toList();
         int total = perfumePage.getTotalPages();
         return new PagePerfumeSimpleRes(total, perfumes);
     }
@@ -245,7 +260,7 @@ public class PerfumeServiceImpl implements PerfumeService {
     public PerfumeSimpleRes getSimplePerfumeById(Long id) throws Exception {
         Perfume perfume = perfumeRepository.findById(id).orElse(null);
         if (perfume == null) throw new Exception("404");
-        return new PerfumeSimpleRes(perfume.getId(), perfume.getBrand().getName(), perfume.getName());
+        return new PerfumeSimpleRes(perfume.getId(), perfume.getBrand().getName(), perfume.getName(), perfume.getGallery().getId());
     }
 
     @Override

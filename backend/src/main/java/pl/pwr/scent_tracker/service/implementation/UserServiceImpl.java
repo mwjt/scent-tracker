@@ -40,12 +40,14 @@ public class UserServiceImpl implements UserService {
         if (user != null) throw new Exception("Email " + userDTO.getEmail() + " already used!");
         user = userRepository.findByLogin(userDTO.getLogin());
         if (user != null) throw new Exception("Login " + userDTO.getLogin() + " already used!");
+        Gallery gallery = galleryRepository.findByName("Default user");
 
         user = User.builder()
                 .email(userDTO.getEmail())
                 .login(userDTO.getLogin())
                 .password(bCryptPasswordEncoder.encode(userDTO.getPassword()))
                 .role(UserRole.USER)
+                .gallery(gallery)
                 .build();
         return userRepository.save(user);
     }

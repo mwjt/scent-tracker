@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -61,10 +62,10 @@ public class Perfume {
     @Column(name = "VALUE", nullable = false)
     private Float value;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "PERFUME_TAG",
             joinColumns = @JoinColumn(name = "PERFUME_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "TAG_ID", referencedColumnName = "ID")
     )
-    private Set<Tag> tags = new HashSet<>();
+    private List<Tag> tags;
 }

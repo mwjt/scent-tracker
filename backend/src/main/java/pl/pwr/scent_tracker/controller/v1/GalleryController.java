@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.pwr.scent_tracker.model.entity.Brand;
 import pl.pwr.scent_tracker.model.entity.Gallery;
 import pl.pwr.scent_tracker.model.entity.Perfume;
 import pl.pwr.scent_tracker.model.entity.User;
@@ -19,8 +20,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/api/v1/gallery/")
@@ -40,7 +40,7 @@ public class GalleryController {
 
     @ResponseBody
     @GetMapping
-    public ResponseEntity perfumeImage(@RequestParam(value = "id") String id) {
+    public ResponseEntity getImage(@RequestParam(value = "id") String id) {
         try {
             Gallery gallery = galleryService.getImageById(Long.valueOf(id));
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(gallery.getImage());
@@ -58,16 +58,10 @@ public class GalleryController {
             @RequestParam(value = "entityId") String entityId,
             final @RequestParam("image")MultipartFile file) {
 
-        if (entityType.equalsIgnoreCase("perfume")) {
+        List<String> supportedEntities = new ArrayList<>(Arrays.asList("perfume", "brand", "perfumer", "profile"));
+        if (supportedEntities.contains(entityType)) {
             try {
                 if (perfumeService.getPerfumeById(Long.valueOf(entityId)) == null)
-                    return ResponseEntity.badRequest().body("ID " + entityId + " of " + entityType + " not found");
-            } catch (Exception e) {
-                return ResponseEntity.internalServerError().body(e.getMessage());
-            }
-        } else if (entityType.equalsIgnoreCase("profile")) {
-            try {
-                if (userService.getUserById(Long.valueOf(entityId)) == null)
                     return ResponseEntity.badRequest().body("ID " + entityId + " of " + entityType + " not found");
             } catch (Exception e) {
                 return ResponseEntity.internalServerError().body(e.getMessage());
@@ -102,9 +96,14 @@ public class GalleryController {
             if (entityType.equalsIgnoreCase("perfume")) {
                 Perfume perfume = perfumeService.getPerfumeById(Long.valueOf(entityId));
                 perfumeService.setPerfumePhoto(perfume, savedGallery);
+            } else if (entityType.equalsIgnoreCase("brand")) {
+                Brand brand = perfumeService.getBrandById(Long.valueOf(entityId));
+                perfumeService.setBrandPhoto(brand, savedGallery);
             } else if (entityType.equalsIgnoreCase("profile")) {
                 User user = userService.getUserById(Long.valueOf(entityId));
                 userService.setUserPhoto(user, savedGallery);
+            } else if (entityType.equalsIgnoreCase("perfumer")) {
+                // TODO
             }
             return ResponseEntity.ok().build();
         } catch (Exception ex) {

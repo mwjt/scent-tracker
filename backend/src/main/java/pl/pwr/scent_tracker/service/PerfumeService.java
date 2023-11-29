@@ -8,6 +8,7 @@ import pl.pwr.scent_tracker.model.dto.entity.BrandDTO;
 import pl.pwr.scent_tracker.model.dto.entity.PerfumeDTO;
 import pl.pwr.scent_tracker.model.entity.Gallery;
 import pl.pwr.scent_tracker.model.entity.Perfume;
+import pl.pwr.scent_tracker.model.entity.Brand;
 
 public interface PerfumeService {
 
@@ -22,6 +23,8 @@ public interface PerfumeService {
     BrandDTO addBrand(BrandDTO brandDTO) throws Exception;
     BrandDTO updateBrand(BrandDTO brandDTO) throws Exception;
     void removeBrand(Long id) throws Exception;
+    Brand getBrandById(Long id) throws Exception;
+    BrandDTO setBrandPhoto(Brand brand, Gallery gallery);
 
     // Perfumes
     Perfume getPerfume(PerfumeReq perfumeReq);

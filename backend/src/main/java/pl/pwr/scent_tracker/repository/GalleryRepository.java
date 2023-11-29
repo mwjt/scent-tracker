@@ -9,4 +9,5 @@ import java.util.List;
 
 @Repository
 public interface GalleryRepository extends JpaRepository<Gallery, Long> {
+    Gallery findByName(String name);
 }

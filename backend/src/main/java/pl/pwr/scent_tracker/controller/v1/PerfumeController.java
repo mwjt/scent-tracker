@@ -47,6 +47,7 @@ public class PerfumeController {
                         .name(perfume.getName())
                         .brand(perfume.getBrand().getName())
                         .perfumer(perfume.getPerfumer().getName())
+                        .galleryId(perfume.getGallery().getId())
                         .concentration(perfume.getConcentration().getName())
                         .year(String.valueOf(perfume.getYear()))
                         .scent(String.valueOf(perfume.getScent()))

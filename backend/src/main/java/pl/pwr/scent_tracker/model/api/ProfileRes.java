@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ProfileRes {
     private String login;
     private String email;
-    private Long gallery_id;
+    private Long galleryId;
     private String role;
 }

@@ -8,8 +8,8 @@ public class PerfumerMapper {
         return PerfumerDTO.builder()
                 .id(perfumer.getId())
                 .name(perfumer.getName())
-                .photoPath(perfumer.getPhotoPath())
-                .textPath(perfumer.getTextPath())
+                .galleryId(perfumer.getGallery().getId())
+                .text(perfumer.getText())
                 .website(perfumer.getWebsite())
                 .countryId(perfumer.getCountry().getId())
                 .build();

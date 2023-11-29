@@ -7,8 +7,6 @@ export default {
       form: false,
       login: null,
       password: null,
-      message: null,
-      alert: false,
     }
   },
   computed: {
@@ -34,12 +32,11 @@ export default {
         () => {
           this.loading = false
           this.$router.push('/profile')
+          this.$store.dispatch('snackbar/display', 'Succesfully logged in')
         },
         (error) => {
           this.loading = false
-          this.message =
-            (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
-          this.alert = true
+          this.$store.dispatch('snackbar/display',  (error.response && error.response.data && error.response.data.message) || error.message || error.toString())
         }
       )
     },
@@ -75,7 +72,6 @@ export default {
           Sign In <v-icon icon="mdi-chevron-right" end></v-icon>
         </v-btn>
       </v-form>
-      <v-alert v-model="alert" class="mt-2" type="error" :text="message" />
       <div style="margin: 10px 0px">Don't have an account? <router-link to="/register"> Sign up! </router-link></div>
     </v-card>
   </v-container>

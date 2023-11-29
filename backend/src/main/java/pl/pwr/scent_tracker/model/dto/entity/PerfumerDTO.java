@@ -17,8 +17,8 @@ public class PerfumerDTO {
 
     private Long id;
     private String name;
-    private String photoPath;
-    private String textPath;
+    private Long galleryId;
+    private String text;
     private String website;
     private Long countryId;
 }

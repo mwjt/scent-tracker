@@ -1,12 +1,14 @@
 <script>
 import { ref } from 'vue'
 import { getProfile } from '../services/user.service'
+import { getImage } from '../services/gallery.service'
 
 export default {
   name: 'ProfileItem',
   data() {
     return {
       user: '',
+      url: ''
     }
   },
   computed: {
@@ -20,7 +22,11 @@ export default {
     let res = await getProfile(this.currentUser.login)
     console.log(res)
     this.user = res
+    console.log(this.user)
     this.$loading = ref(false)
+    res = await getImage(this.user.galleryId)
+    this.url = URL.createObjectURL(res)
+    console.log(this.url)
   },
 }
 </script>
@@ -28,6 +34,11 @@ export default {
 <template>
   <v-container>
     <v-row>
+      <v-col>
+        <v-card class="pa-1 mr-1" height="100%" width="200px">
+          <v-img aspect-ratio="1/1" :src="url"></v-img>
+        </v-card>
+      </v-col>
       <v-col>
         <v-card class="ma-2 pa-2 entries">
           <div class="top">Username: {{ this.user.login }}</div>
@@ -37,15 +48,6 @@ export default {
       </v-col>
     </v-row>
   </v-container>
-
-  <v-col cols="auto">
-    <v-sheet elevation="10" class="py-4 px-1">
-      <v-chip-group mandatory selected-class="text-primary">
-        <v-chip> {{ login }} </v-chip>
-        <v-chip>{{ email }}</v-chip>
-      </v-chip-group>
-    </v-sheet>
-  </v-col>
 </template>
 
 <style lang="scss">

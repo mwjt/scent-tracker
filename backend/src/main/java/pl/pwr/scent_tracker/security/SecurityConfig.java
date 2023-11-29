@@ -49,7 +49,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/**")
                                 .permitAll()
                                 .anyRequest()
-                                .authenticated()
+                                //.authenticated()
+                                .permitAll() //TODO
                 )
                 .exceptionHandling(
                         (exceptionHandling) -> exceptionHandling

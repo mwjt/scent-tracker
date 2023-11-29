@@ -3,9 +3,9 @@ import authHeader from './auth-header'
 
 const API = '/api/v1/gallery/'
 
-export async function getPerfumeImage(id) {
-  const promise = axios.get(API + '/perfume', {
-    params: { perfumeId: id },
+export async function getImage(id) {
+  const promise = axios.get(API, {
+    params: { id: id },
     headers: authHeader(),
     responseType: 'blob',
   })

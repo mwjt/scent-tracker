@@ -13,4 +13,5 @@ public class PerfumeSimpleRes {
     private Long id;
     private String brand;
     private String name;
+    private Long galleryId;
 }

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.sql.Blob;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -24,11 +26,13 @@ public class Brand {
     @Column(name = "NAME", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "PHOTO_PATH")
-    private String photoPath;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "GALLERY_ID")
+    private Gallery gallery;
 
-    @Column(name = "TEXT_PATH")
-    private String textPath;
+    @Lob
+    @Column(name = "TEXT", columnDefinition = "TEXT")
+    private String text;
 
     @Column(name = "WEBSITE")
     private String website;

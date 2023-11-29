@@ -1,6 +1,6 @@
 <script>
 import { getPerfumeByBrandAndName } from '../services/perfume.service'
-import { getPerfumeImage } from '../services/gallery.service'
+import { getImage } from '../services/gallery.service'
 
 export default {
   name: 'PerfumeItem',
@@ -18,7 +18,7 @@ export default {
     this.$loading = false
     this.imageLoading = true
     console.log(this.perfume)
-    res = await getPerfumeImage(this.perfume.id)
+    res = await getImage(this.perfume.galleryId)
     this.url = URL.createObjectURL(res)
     this.imageLoading = false
   },

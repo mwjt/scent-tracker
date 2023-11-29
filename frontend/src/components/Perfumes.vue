@@ -1,6 +1,8 @@
 <script>
 import { ref } from 'vue'
 import { getPage } from '../services/perfume.service'
+import { getImage } from '../services/gallery.service'
+import { handleError } from 'vue'
 
 export default {
   name: 'PerfumesItem',
@@ -44,6 +46,8 @@ export default {
       this.$loading = false
     },
   },
+
+
 }
 </script>
 

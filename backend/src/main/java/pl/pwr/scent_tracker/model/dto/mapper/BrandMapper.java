@@ -8,8 +8,8 @@ public class BrandMapper {
         return BrandDTO.builder()
                 .id(brand.getId())
                 .name(brand.getName())
-                .photoPath(brand.getPhotoPath())
-                .textPath(brand.getTextPath())
+                .galleryId(brand.getGallery().getId())
+                .text(brand.getText())
                 .website(brand.getWebsite())
                 .countryId(brand.getCountry().getId())
                 .build();

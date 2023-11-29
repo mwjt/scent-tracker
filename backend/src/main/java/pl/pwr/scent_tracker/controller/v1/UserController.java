@@ -24,7 +24,7 @@ public class UserController {
             res.setLogin(user.getLogin());
             res.setEmail(user.getEmail());
             res.setRole(user.getRole().name());
-            if (user.getGallery() != null) res.setGallery_id(user.getGallery().getId());
+            if (user.getGallery() != null) res.setGalleryId(user.getGallery().getId());
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());

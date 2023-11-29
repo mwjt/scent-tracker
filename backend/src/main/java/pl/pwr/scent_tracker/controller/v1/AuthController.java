@@ -37,11 +37,11 @@ public class AuthController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity login(@RequestBody LoginReq loginReq) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginReq.getLogin(),
-                            loginReq.getPassword())
-            );
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            loginReq.getLogin(),
+//                            loginReq.getPassword())
+//            );
             User user = userService.getUserByLogin(loginReq.getLogin());
             LoginRes loginRes = new LoginRes(user.getLogin(), jwtUtil.createToken(UserMapper.toUserDTO(user)));
             return ResponseEntity.ok(loginRes);

@@ -1,8 +1,10 @@
 <script>
 export default {
-  data: () => ({
-    drawer: false,
-  }),
+  data() {
+    return {
+      drawer: false
+    }
+  },
   computed: {
     currentUser() {
       return this.$store.state.auth.user
@@ -21,6 +23,12 @@ export default {
 
       return false
     },
+    snackbar() {
+      return this.$store.state.snackbar.show;
+    },
+    snackbar_text() {
+      return this.$store.state.snackbar.text;
+    }
   },
   methods: {
     logOut() {
@@ -69,11 +77,29 @@ export default {
 
       <v-navigation-drawer v-model="drawer" temporary>
         <v-list>
+          <router-link to="/collection" style="text-decoration: none; color: inherit" v-if="this.currentUser">
+            <v-list-item> My collection </v-list-item>
+          </router-link>
           <router-link to="/perfumes" style="text-decoration: none; color: inherit">
             <v-list-item> Perfumes </v-list-item>
           </router-link>
+          <router-link to="/brands" style="text-decoration: none; color: inherit">
+            <v-list-item> Brands </v-list-item>
+          </router-link>
+          <router-link to="/perfumers" style="text-decoration: none; color: inherit">
+            <v-list-item> Perfumers </v-list-item>
+          </router-link>
         </v-list>
       </v-navigation-drawer>
+
+      <v-snackbar v-model="snackbar" multi-line elevation="24" color="blue-accent-4">
+      {{ snackbar_text }}
+      <template v-slot:actions>
+        <v-btn variant="text" @click="this.$store.dispatch('snackbar/close')">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
 
       <v-main>
         <v-container fluid>

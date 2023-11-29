@@ -8,9 +8,7 @@ export default {
       password1: null,
       password2: null,
       loading: false,
-      message: '',
       terms: false,
-      alert: false,
       form: false,
       rules: {
         required: (value) => !!value || 'Field is required',
@@ -21,7 +19,7 @@ export default {
         },
         password: (value) => {
           const pattern = /^^[a-zA-Z0-9]{6,}$/
-          return pattern.test(value) || 'Password too simple (use at least 6 characters'
+          return pattern.test(value) || 'Use at least 6 characters'
         },
         repeatPassword: (value) => {
           return value == this.password1 || 'Passwords must be identical'
@@ -41,8 +39,6 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log('guwno')
-
       this.message = ''
       this.loading = true
 
@@ -54,13 +50,13 @@ export default {
 
       this.$store.dispatch('auth/register', user).then(
         (data) => {
-          this.message = data.message
           this.loading = false
+          this.$router.push('/login')
+          this.$store.dispatch('snackbar/display', 'Succesfully registered, you can login now')
         },
         (error) => {
-          this.message =
-            (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
           this.loading = false
+          this.$store.dispatch('snackbar/display',  (error.response && error.response.data && error.response.data.message) || error.message || error.toString())
         }
       )
     },
@@ -95,6 +91,7 @@ export default {
           :readonly="loading"
           :rules="[rules.required, rules.password]"
           clearable
+          type="password"
           label="Password"
         ></v-text-field>
 
@@ -103,6 +100,7 @@ export default {
           :readonly="loading"
           :rules="[rules.required, rules.repeatPassword]"
           clearable
+          type="password"
           label="Repeat password"
         ></v-text-field>
 
@@ -119,7 +117,6 @@ export default {
           <v-icon icon="mdi-chevron-right" end></v-icon>
         </v-btn>
       </v-form>
-      <v-alert v-model="alert" class="mt-2" type="error" :text="message" />
       <div style="margin: 10px 0px">Registered already? <router-link to="/login"> Sign in! </router-link></div>
     </v-card>
   </v-container>
