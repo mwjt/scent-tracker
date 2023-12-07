@@ -36,7 +36,10 @@ export default {
         },
         (error) => {
           this.loading = false
-          this.$store.dispatch('snackbar/display',  (error.response && error.response.data && error.response.data.message) || error.message || error.toString())
+          this.$store.dispatch(
+            'snackbar/display',
+            (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+          )
         }
       )
     },
@@ -66,6 +69,7 @@ export default {
           :rules="[required]"
           clearable
           label="Password"
+          type="password"
         ></v-text-field>
 
         <v-btn :disabled="!form" :loading="loading" type="submit" block color="success">

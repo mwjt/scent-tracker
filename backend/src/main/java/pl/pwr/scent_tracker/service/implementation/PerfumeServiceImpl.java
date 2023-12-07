@@ -259,7 +259,7 @@ public class PerfumeServiceImpl implements PerfumeService {
     @Override
     public PerfumeSimpleRes getSimplePerfumeById(Long id) throws Exception {
         Perfume perfume = perfumeRepository.findById(id).orElse(null);
-        if (perfume == null) throw new Exception("404");
+        if (perfume == null) throw new Exception("Perfume not found");
         return new PerfumeSimpleRes(perfume.getId(), perfume.getBrand().getName(), perfume.getName(), perfume.getGallery().getId());
     }
 

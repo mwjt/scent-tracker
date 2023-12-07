@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.Accessors;
+import pl.pwr.scent_tracker.model.entity.CollectionType;
 
 import java.sql.Blob;
 
@@ -20,7 +21,7 @@ public class CollectionEntryDTO {
     private Long id;
     private Long userId;
     private Long perfumeId;
-    private Long collectionTypeId;
+    private CollectionType collectionType;
     private Short quantity;
-    private Blob note;
+    private String note;
 }

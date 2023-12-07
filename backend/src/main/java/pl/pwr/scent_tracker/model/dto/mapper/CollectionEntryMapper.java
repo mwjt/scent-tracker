@@ -9,7 +9,7 @@ public class CollectionEntryMapper {
                 .id(collectionEntry.getId())
                 .userId(collectionEntry.getUser().getId())
                 .perfumeId(collectionEntry.getPerfume().getId())
-                .collectionTypeId(collectionEntry.getCollectionType().getId())
+                .collectionType(collectionEntry.getCollectionType())
                 .quantity(collectionEntry.getQuantity())
                 .note(collectionEntry.getNote())
                 .build();

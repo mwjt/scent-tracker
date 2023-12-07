@@ -32,14 +32,13 @@ public class CollectionEntry {
     @JoinColumn(name = "PERFUME_ID", nullable = false)
     private Perfume perfume;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COLLECTION_TYPE_ID", nullable = false)
+    @Column(name = "COLLECTION_TYPE", nullable = false)
     private CollectionType collectionType;
 
     @Column(name = "QUANTITY", nullable = false)
     private Short quantity;
 
     @Lob
-    @Column(name = "NOTE")
-    private Blob note;
+    @Column(name = "NOTE", columnDefinition = "TEXT")
+    private String note;
 }

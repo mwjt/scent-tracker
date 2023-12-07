@@ -16,38 +16,52 @@ export default {
   },
   async beforeMount() {
     this.$loading = ref(true)
-    let res = await getPage(1)
-    this.items = []
-    for (const p of res.perfumes)
-      this.items.push({
-        title: p.brand + ' ' + p.name,
-        props: {
-          to: '/perfumes/' + p.brand.replace(' ', '_') + '/' + p.name.replace(' ', '_'),
-        },
-      })
-    this.length = res.total > 0 ? Math.ceil(res.total / this.perPage) : 1
-    this.page = this.page > this.length ? this.length : this.page
-    this.$loading = ref(false)
+    await getPage(1).then(
+      (response) => {
+        this.items = []
+        for (const p of response.data.perfumes)
+          this.items.push({
+            title: p.brand + ' ' + p.name,
+            props: {
+              to: '/perfumes/' + p.brand.replace(' ', '_') + '/' + p.name.replace(' ', '_'),
+            },
+          })
+        this.length = response.data.total > 0 ? Math.ceil(response.data.total / this.perPage) : 1
+        this.page = this.page > this.length ? this.length : this.page
+      },
+      (error) => {
+        this.$store.dispatch(
+          'snackbar/display',
+          (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+        )
+      }
+    )
   },
   watch: {
     async page(val) {
       this.$loading = true
-      let res = await getPage(val)
-      this.items = []
-      for (const p of res.perfumes)
-        this.items.push({
-          title: p.brand + ' ' + p.name,
-          props: {
-            to: '/perfumes/' + p.brand.replace(' ', '_') + '/' + p.name.replace(' ', '_'),
-          },
-        })
-      this.length = res.total > 0 ? Math.ceil(res.total / this.perPage) : 1
-      this.page = this.page > this.length ? this.length : this.page
-      this.$loading = false
+      await getPage(val).then(
+        (response) => {
+          this.items = []
+          for (const p of response.data.perfumes)
+            this.items.push({
+              title: p.brand + ' ' + p.name,
+              props: {
+                to: '/perfumes/' + p.brand.replace(' ', '_') + '/' + p.name.replace(' ', '_'),
+              },
+            })
+          this.length = response.data.total > 0 ? Math.ceil(response.data.total / this.perPage) : 1
+          this.page = this.page > this.length ? this.length : this.page
+        },
+        (error) => {
+          this.$store.dispatch(
+            'snackbar/display',
+            (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+          )
+        }
+      )
     },
   },
-
-
 }
 </script>
 

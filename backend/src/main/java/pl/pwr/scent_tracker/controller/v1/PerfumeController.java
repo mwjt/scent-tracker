@@ -66,8 +66,7 @@ public class PerfumeController {
             PerfumeSimpleRes perfume = perfumeService.getSimplePerfumeById(Long.valueOf(id));
             return ResponseEntity.ok(perfume);
         } catch (Exception e) {
-            if (e.getMessage().equals("404")) return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
-        return ResponseEntity.ok(null);
     }
 }

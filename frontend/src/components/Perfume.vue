@@ -1,6 +1,7 @@
 <script>
 import { getPerfumeByBrandAndName } from '../services/perfume.service'
 import { getImage } from '../services/gallery.service'
+import { getUserCollectionEntry, getUserReviewEntry, saveUserCollectionEntry } from '../services/collection.service'
 
 export default {
   name: 'PerfumeItem',
@@ -9,18 +10,77 @@ export default {
       imageLoading: false,
       url: '',
       perfume: {},
+      collection: {
+        type: '',
+        quantity: '',
+        note: '',
+      },
+      review: {},
+      reviews: [],
+      openedCollection: false,
+      openedReview: false,
+      openedTag: false,
+      collectionModel: false,
+      reviewModel: false,
+      tagModel: false,
     }
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user
+    },
   },
   async beforeMount() {
     this.$loading = true
-    let res = await getPerfumeByBrandAndName(this.$route.params.brand, this.$route.params.name)
-    this.perfume = res
-    this.$loading = false
-    this.imageLoading = true
-    console.log(this.perfume)
-    res = await getImage(this.perfume.galleryId)
-    this.url = URL.createObjectURL(res)
-    this.imageLoading = false
+    await getPerfumeByBrandAndName(this.$route.params.brand, this.$route.params.name).then(
+      (response) => {
+        this.perfume = response.data
+        this.$loading = false
+        this.imageLoading = true
+      },
+      (error) => {
+        this.$store.dispatch(
+          'snackbar/display',
+          (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+        )
+      }
+    )
+    await getImage(this.perfume.galleryId).then((response) => {
+      this.url = URL.createObjectURL(response.data)
+      this.imageLoading = false
+    })
+  },
+  methods: {
+    async getCollection() {
+      await getUserCollectionEntry(this.perfume.id).then((response) => {
+        this.collection = response.data
+      })
+    },
+    async getReview() {
+      await getUserReviewEntry(this.perfume.id).then((response) => {
+        this.review = response.data
+      })
+    },
+  },
+  watch: {
+    collection: {
+      handler: async function (newVal) {
+        console.log(newVal)
+        await saveUserCollectionEntry(this.perfume.id, newVal).then(
+          () => (this.loading = false),
+          (error) => {
+            this.loading = false
+            this.$store.dispatch(
+              'snackbar/display',
+              (error.response && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString()
+            )
+          }
+        )
+      },
+      deep: true,
+    },
   },
 }
 </script>
@@ -58,6 +118,7 @@ export default {
           </v-col>
           <v-col>
             <v-card class="pa-1 ml-1" height="100%">
+              <v-card-title>Tags</v-card-title>
               <v-chip-group column>
                 <v-chip v-for="tag in perfume.tags" :key="tag">
                   {{ tag }}
@@ -125,7 +186,52 @@ export default {
         </v-card>
       </v-col>
       <v-col>
-        <v-card class="reviews ma-2 pa-1"> Reviews </v-card>
+        <v-card class="buttons ma-2 pa-3" v-if="this.currentUser">
+          <div class="d-flex justify-space-around">
+            <v-btn color="primary"
+              >Collection
+              <v-dialog v-model="openedCollection" activator="parent" width="auto" min-width="300">
+                <v-card class="ma-1 pa-2">
+                  <v-form v-model="collectionModel">
+                    <v-container>
+                      <v-row>
+                        <v-select label="Type" :items="['Bottle', 'Decant', 'Sample']" v-model="collection.type" />
+                        <v-text-field label="Quantity" v-model="collection.quantity" type="number" />
+                      </v-row>
+                      <v-row>
+                        <v-textarea label="Note" v-model="collection.note"></v-textarea>
+                      </v-row>
+                    </v-container>
+                  </v-form>
+                  <v-card-actions>
+                    <v-btn color="primary" block @click="openedCollection = false">Close</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-btn>
+            <v-btn color="primary"
+              >Review
+              <v-dialog v-model="openedReview" activator="parent" width="auto">
+                <v-card>
+                  <v-card-actions>
+                    <v-btn color="primary" block @click="openedReview = false">Close</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-btn>
+            <v-btn color="primary"
+              >Tag
+              <v-dialog v-model="openedTag" activator="parent" width="auto">
+                <v-card>
+                  <v-card-actions>
+                    <v-btn color="primary" block @click="openedTag = false">Close</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-btn>
+          </div>
+        </v-card>
+        <v-card class="reviews ma-2 pa-1"> <v-card-title>Reviews</v-card-title> </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -185,6 +291,10 @@ $subcolor: rgb(85, 85, 85);
 }
 
 .reviews {
+  width: 100%;
+}
+
+.buttons {
   width: 100%;
 }
 </style>
